@@ -21,6 +21,7 @@ type TransactionService struct {
 func InitTransactionService(db *mongo.Database, logger *zap.SugaredLogger) service.ITransactionService {
 	return &TransactionService{
 		repository: repo.InitTransactionRepository(db, logger),
+		logger:     logger,
 	}
 }
 
@@ -95,7 +96,7 @@ func (s *TransactionService) GetSummary(ctx context.Context) (*entity.Summary, e
 
 	wg.Wait()
 
-	s.logger.Infow("transactionService.getSummary", "summary", summary)
+	s.logger.Info("summary", summary)
 
 	return &summary, nil
 }
