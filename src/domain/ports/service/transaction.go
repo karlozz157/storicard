@@ -7,5 +7,6 @@ import (
 )
 
 type ITransactionService interface {
+	CreateTransactions(ctx context.Context, transactions []*entity.Transaction) error
 	GetSummary(ctx context.Context) (*entity.Summary, error)
 }

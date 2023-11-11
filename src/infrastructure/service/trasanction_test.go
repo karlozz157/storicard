@@ -6,7 +6,55 @@ import (
 	"time"
 
 	"github.com/karlozz157/storicard/src/domain/entity"
+	e "github.com/karlozz157/storicard/src/domain/errors"
 )
+
+func TestCreateTransactions(t *testing.T) {
+
+	tests := []struct {
+		Transactions []*entity.Transaction
+		Expected     error
+	}{
+		{
+			Transactions: []*entity.Transaction{
+				{
+					Date:   time.Now(),
+					Amount: +10,
+				},
+				{
+					Date:   time.Now(),
+					Amount: -5,
+				},
+			},
+			Expected: nil,
+		},
+		{
+			Transactions: []*entity.Transaction{
+				{
+					Date:   time.Now(),
+					Amount: 1,
+				},
+				{
+					Date:   time.Now(),
+					Amount: 157,
+				},
+			},
+			Expected: e.ErrInternal,
+		},
+	}
+
+	service := TransactionService{
+		repository: &TransactionRepositoryMock{},
+	}
+
+	for _, test := range tests {
+		err := service.CreateTransactions(context.Background(), test.Transactions)
+
+		if test.Expected != err {
+			t.Errorf("expected %v have %v", test.Expected, err)
+		}
+	}
+}
 
 func TestGetSummary(t *testing.T) {
 
@@ -75,6 +123,10 @@ func (r *TransactionRepositoryMock) GetNumberOfTransactions(ctx context.Context)
 	return numberOfTransactions, nil
 }
 
-func (r *TransactionRepositoryMock) CreateTransaction(ctx context.Context, account *entity.Transaction) error {
+func (r *TransactionRepositoryMock) CreateTransaction(ctx context.Context, transaction *entity.Transaction) error {
+	if transaction.Amount == 157 {
+		return e.ErrInternal
+	}
+
 	return nil
 }

@@ -4,19 +4,51 @@ import (
 	"context"
 	"sync"
 
+	"go.mongodb.org/mongo-driver/mongo"
+	"go.uber.org/zap"
+
 	"github.com/karlozz157/storicard/src/domain/entity"
 	"github.com/karlozz157/storicard/src/domain/ports/repository"
 	"github.com/karlozz157/storicard/src/domain/ports/service"
-	"go.mongodb.org/mongo-driver/mongo"
-	"go.uber.org/zap"
+	repo "github.com/karlozz157/storicard/src/infrastructure/repository"
 )
 
 type TransactionService struct {
+	logger     *zap.SugaredLogger
 	repository repository.ITransactionRepository
 }
 
 func InitTransactionService(db *mongo.Database, logger *zap.SugaredLogger) service.ITransactionService {
-	return &TransactionService{}
+	return &TransactionService{
+		repository: repo.InitTransactionRepository(db, logger),
+	}
+}
+
+func (s *TransactionService) CreateTransactions(ctx context.Context, transactions []*entity.Transaction) error {
+	chanDone := make(chan bool)
+	chanErr := make(chan error)
+
+	for _, transaction := range transactions {
+		go func(transaction *entity.Transaction) {
+			if err := s.repository.CreateTransaction(ctx, transaction); err != nil {
+				chanErr <- err
+				return
+			}
+
+			chanDone <- true
+		}(transaction)
+	}
+
+	for range transactions {
+		select {
+		case <-chanDone:
+		case err := <-chanErr:
+			close(chanErr)
+			return err
+		}
+	}
+
+	return nil
 }
 
 func (s *TransactionService) GetSummary(ctx context.Context) (*entity.Summary, error) {
@@ -62,6 +94,8 @@ func (s *TransactionService) GetSummary(ctx context.Context) (*entity.Summary, e
 	}()
 
 	wg.Wait()
+
+	s.logger.Infow("transactionService.getSummary", "summary", summary)
 
 	return &summary, nil
 }
