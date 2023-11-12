@@ -8,6 +8,7 @@ import (
 
 	"github.com/karlozz157/storicard/src/domain/entity"
 	"github.com/karlozz157/storicard/src/domain/ports/repository"
+	"github.com/karlozz157/storicard/src/utils"
 )
 
 type TransactionService struct {
@@ -17,6 +18,7 @@ type TransactionService struct {
 
 func NewTransactionService(repository repository.ITransactionRepository) *TransactionService {
 	return &TransactionService{
+		logger:     utils.GetLogger(),
 		repository: repository,
 	}
 }

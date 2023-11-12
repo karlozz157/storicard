@@ -27,7 +27,7 @@ func (s *StoriServer) Serve() {
 	handler := application.NewTransactionHandler(db)
 
 	http.HandleFunc("/storicard", func(w http.ResponseWriter, r *http.Request) {
-		_, err := handler.CreateSummary(context.Background(), s.getBody(r))
+		res, err := handler.CreateSummary(context.Background(), s.getBody(r))
 
 		w.Header().Set("Content-Type", "application/json")
 
@@ -36,6 +36,9 @@ func (s *StoriServer) Serve() {
 			http.Error(w, message, statusCode)
 			return
 		}
+
+		w.WriteHeader(res.StatusCode)
+		w.Write([]byte(res.Message))
 	})
 
 	if err := http.ListenAndServe(":8080", nil); err != nil {
