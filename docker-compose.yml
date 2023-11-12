@@ -3,13 +3,11 @@ services:
   mongo:
     image: mongo
     ports:
-      - "27018:27017"
+      - "27017:27017"
 
   app:
     build:
       context: .
-    ports:
-      - "8080:8080"
     depends_on:
       - mongo
     environment:
@@ -21,4 +19,4 @@ services:
       MONGO_DATABASE: "storicard"
       PORT: "8080"
       ENVIRONMENT: "local"
-  
+    network_mode: host
