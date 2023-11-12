@@ -31,6 +31,9 @@ jobs:
       - name: Zip
         run: zip deploy.zip main
 
+      - name: Added templates to zip
+        run: zip -r deploy.zip templates/
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v1
         with:
