@@ -10,10 +10,10 @@ import (
 
 var logger = utils.GetLogger()
 
-func handler(ctx context.Context, request events.APIGatewayProxyRequest) (events.APIGatewayProxyResponse, error) {
+func handler(ctx context.Context, request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLResponse, error) {
 	logger.Info("request", request)
 
-	return events.APIGatewayProxyResponse{
+	return events.LambdaFunctionURLResponse{
 		StatusCode: 200,
 		Body:       "hello world",
 	}, nil
