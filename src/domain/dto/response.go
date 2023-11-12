@@ -1,6 +1,6 @@
 package dto
 
 type Response struct {
-	Message    string
-	StatusCode int
+	Message    string `json:"message"`
+	StatusCode int    `json:"status_code"`
 }

@@ -25,7 +25,8 @@ func handler(ctx context.Context, request events.LambdaFunctionURLRequest) (even
 		email = queryStringSplited[1]
 	}
 
-	body, _ := base64.StdEncoding.DecodeString(request.Body)
+	body, err := base64.StdEncoding.DecodeString(request.Body)
+	logger.Info("email", email, "body", body, "err", err)
 
 	handler := application.NewTransactionHandler(utils.InitMongoDb())
 	res, err := handler.CreateSummary(context.Background(), email, bytes.NewReader(body))
