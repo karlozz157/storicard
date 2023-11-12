@@ -34,7 +34,7 @@ func (r *CsvTransactionReader) GetTransactions(data io.Reader) ([]*entity.Transa
 
 	if err != nil {
 		r.logger.Errorw("reading csv", "err", err)
-		return nil, e.ErrInternal
+		return nil, e.ErrInternal()
 	}
 
 	var transactions []*entity.Transaction
