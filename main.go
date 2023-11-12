@@ -1,7 +1,16 @@
 package main
 
-import "github.com/karlozz157/storicard/src/infrastructure/interfaces/http"
+import (
+	"os"
+
+	"github.com/karlozz157/storicard/src/infrastructure/interfaces/aws"
+	"github.com/karlozz157/storicard/src/infrastructure/interfaces/http"
+)
 
 func main() {
-	http.StartServer()
+	if os.Getenv("ENVIRONMENT") == "aws" {
+		aws.StartLambda()
+	} else {
+		http.StartServer()
+	}
 }
