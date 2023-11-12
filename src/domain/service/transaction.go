@@ -24,6 +24,8 @@ func NewTransactionService(repository repository.ITransactionRepository) *Transa
 }
 
 func (s *TransactionService) CreateTransactions(ctx context.Context, transactions []*entity.Transaction) error {
+	s.logger.Info("transactions", transactions)
+
 	chanDone := make(chan bool)
 	chanErr := make(chan error)
 

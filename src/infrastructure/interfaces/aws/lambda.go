@@ -1,7 +1,6 @@
 package aws
 
 import (
-	"bytes"
 	"context"
 	"encoding/base64"
 	"strings"
@@ -27,8 +26,12 @@ func handler(ctx context.Context, request events.LambdaFunctionURLRequest) (even
 
 	body, _ := base64.StdEncoding.DecodeString(request.Body)
 
+	if request.IsBase64Encoded {
+		body, _ = base64.StdEncoding.DecodeString(string(body))
+	}
+
 	handler := application.NewTransactionHandler(utils.InitMongoDb())
-	res, err := handler.CreateSummary(context.Background(), email, bytes.NewReader(body))
+	res, err := handler.CreateSummary(context.Background(), email, strings.NewReader(string(body)))
 
 	if err != nil {
 		statusCode, message := e.ParseError(err)
