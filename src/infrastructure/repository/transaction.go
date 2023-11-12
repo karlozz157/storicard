@@ -12,6 +12,7 @@ import (
 	"github.com/karlozz157/storicard/src/domain/entity"
 	e "github.com/karlozz157/storicard/src/domain/errors"
 	"github.com/karlozz157/storicard/src/domain/ports/repository"
+	"github.com/karlozz157/storicard/src/utils"
 )
 
 const transactionCollection = "transactions"
@@ -21,11 +22,24 @@ type TransactionRepository struct {
 	logger *zap.SugaredLogger
 }
 
-func InitTransactionRepository(db *mongo.Database, logger *zap.SugaredLogger) repository.ITransactionRepository {
+func NewTransactionRepository(db *mongo.Database) repository.ITransactionRepository {
 	return &TransactionRepository{
 		db:     db,
-		logger: logger,
+		logger: utils.GetLogger(),
 	}
+}
+
+func (r *TransactionRepository) CreateTransaction(ctx context.Context, account *entity.Transaction) error {
+	result, err := r.db.Collection(transactionCollection).InsertOne(ctx, account)
+
+	if err != nil {
+		r.logger.Errorw("creating account", "error", err)
+		return e.ErrInternal()
+	}
+
+	r.logger.Infow("created", "result", result)
+
+	return nil
 }
 
 func (r *TransactionRepository) GetAverageCreditAmount(ctx context.Context) (float64, error) {
@@ -57,7 +71,7 @@ func (r *TransactionRepository) GetNumberOfTransactions(ctx context.Context) (ma
 
 	if err != nil {
 		r.logger.Errorw("getting transctions", "error", err)
-		return nil, e.ErrInternal
+		return nil, e.ErrInternal()
 	}
 
 	numberOfTransactions := make(map[time.Month]int)
@@ -66,7 +80,7 @@ func (r *TransactionRepository) GetNumberOfTransactions(ctx context.Context) (ma
 		var t entity.Transaction
 		if err := cursor.Decode(&t); err != nil {
 			r.logger.Errorw("decoding result", "error", err)
-			return nil, e.ErrInternal
+			return nil, e.ErrInternal()
 		}
 
 		m := t.Date.Month()
@@ -79,19 +93,6 @@ func (r *TransactionRepository) GetNumberOfTransactions(ctx context.Context) (ma
 	}
 
 	return numberOfTransactions, nil
-}
-
-func (r *TransactionRepository) CreateTransaction(ctx context.Context, account *entity.Transaction) error {
-	result, err := r.db.Collection(transactionCollection).InsertOne(ctx, account)
-
-	if err != nil {
-		r.logger.Errorw("creating account", "error", err)
-		return e.ErrInternal
-	}
-
-	r.logger.Infow("created", "result", result)
-
-	return nil
 }
 
 func (r *TransactionRepository) getAverage(ctx context.Context, operator string) (float64, error) {
@@ -117,7 +118,7 @@ func (r *TransactionRepository) getTotal(ctx context.Context, pipeline bson.A) (
 
 	if err != nil {
 		r.logger.Errorw("doing aggregate", "error", err)
-		return 0, e.ErrInternal
+		return 0, e.ErrInternal()
 	}
 
 	type Result struct {
@@ -131,7 +132,7 @@ func (r *TransactionRepository) getTotal(ctx context.Context, pipeline bson.A) (
 
 		if err != nil {
 			r.logger.Errorw("decoding result", "error", err)
-			return 0, e.ErrInternal
+			return 0, e.ErrInternal()
 		}
 	}
 
