@@ -34,7 +34,7 @@ func (r *TransactionRepository) CreateTransaction(ctx context.Context, account *
 
 	if err != nil {
 		r.logger.Errorw("creating account", "error", err)
-		return e.ErrInternal()
+		return e.ErrInternal
 	}
 
 	r.logger.Infow("created", "result", result)
@@ -71,7 +71,7 @@ func (r *TransactionRepository) GetNumberOfTransactions(ctx context.Context) (ma
 
 	if err != nil {
 		r.logger.Errorw("getting transctions", "error", err)
-		return nil, e.ErrInternal()
+		return nil, e.ErrInternal
 	}
 
 	numberOfTransactions := make(map[time.Month]int)
@@ -80,7 +80,7 @@ func (r *TransactionRepository) GetNumberOfTransactions(ctx context.Context) (ma
 		var t entity.Transaction
 		if err := cursor.Decode(&t); err != nil {
 			r.logger.Errorw("decoding result", "error", err)
-			return nil, e.ErrInternal()
+			return nil, e.ErrInternal
 		}
 
 		m := t.Date.Month()
@@ -118,7 +118,7 @@ func (r *TransactionRepository) getTotal(ctx context.Context, pipeline bson.A) (
 
 	if err != nil {
 		r.logger.Errorw("doing aggregate", "error", err)
-		return 0, e.ErrInternal()
+		return 0, e.ErrInternal
 	}
 
 	type Result struct {
@@ -132,7 +132,7 @@ func (r *TransactionRepository) getTotal(ctx context.Context, pipeline bson.A) (
 
 		if err != nil {
 			r.logger.Errorw("decoding result", "error", err)
-			return 0, e.ErrInternal()
+			return 0, e.ErrInternal
 		}
 	}
 

@@ -40,7 +40,7 @@ func TestCreateTransactions(t *testing.T) {
 					Amount: 157,
 				},
 			},
-			Expected: e.ErrInternal(),
+			Expected: e.ErrInternal,
 		},
 	}
 
@@ -129,7 +129,7 @@ func (r *TransactionRepositoryMock) GetNumberOfTransactions(ctx context.Context)
 
 func (r *TransactionRepositoryMock) CreateTransaction(ctx context.Context, transaction *entity.Transaction) error {
 	if transaction.Amount == 157 {
-		return e.ErrInternal()
+		return e.ErrInternal
 	}
 
 	return nil

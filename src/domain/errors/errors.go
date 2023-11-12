@@ -5,6 +5,8 @@ import (
 	"net/http"
 )
 
+var ErrInternal = NewErrStori("internal", http.StatusInternalServerError)
+
 type ErrStori struct {
 	Mesage     string
 	StatusCode int
@@ -19,8 +21,4 @@ func NewErrStori(message string, statusCode int) *ErrStori {
 
 func (e *ErrStori) Error() string {
 	return fmt.Sprint(e.Mesage)
-}
-
-func ErrInternal() error {
-	return NewErrStori("internal", http.StatusInternalServerError)
 }
