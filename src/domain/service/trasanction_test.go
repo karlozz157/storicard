@@ -77,7 +77,7 @@ func TestGetSummary(t *testing.T) {
 		logger:     utils.GetLogger(),
 	}
 
-	summary, _ := service.GetSummary(context.Background())
+	summary, _ := service.GetSummary(context.Background(), "karlozz157@gmail.com")
 
 	if test.summary.Balance != summary.Balance {
 		t.Errorf("balance expected %.2f have %.2f", test.summary.Balance, summary.Balance)
@@ -107,19 +107,19 @@ func TestGetSummary(t *testing.T) {
 type TransactionRepositoryMock struct {
 }
 
-func (r *TransactionRepositoryMock) GetAverageCreditAmount(ctx context.Context) (float64, error) {
+func (r *TransactionRepositoryMock) GetAverageCreditAmount(ctx context.Context, email string) (float64, error) {
 	return 35.25, nil
 }
 
-func (r *TransactionRepositoryMock) GetAverageDebitAmount(ctx context.Context) (float64, error) {
+func (r *TransactionRepositoryMock) GetAverageDebitAmount(ctx context.Context, email string) (float64, error) {
 	return -15.38, nil
 }
 
-func (r *TransactionRepositoryMock) GetBalance(ctx context.Context) (float64, error) {
+func (r *TransactionRepositoryMock) GetBalance(ctx context.Context, email string) (float64, error) {
 	return 39.74, nil
 }
 
-func (r *TransactionRepositoryMock) GetNumberOfTransactions(ctx context.Context) (map[time.Month]int, error) {
+func (r *TransactionRepositoryMock) GetNumberOfTransactions(ctx context.Context, email string) (map[time.Month]int, error) {
 	numberOfTransactions := make(map[time.Month]int)
 	numberOfTransactions[time.July] = 2
 	numberOfTransactions[time.August] = 2

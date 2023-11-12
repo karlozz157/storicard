@@ -3,64 +3,63 @@ package http
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
+	"fmt"
 	"io"
 	"log"
 	"net/http"
+	"os"
 	"strings"
 
-	e "github.com/karlozz157/storicard/src/domain/errors"
-
+	"github.com/gorilla/mux"
 	"github.com/karlozz157/storicard/src/application"
+	e "github.com/karlozz157/storicard/src/domain/errors"
 	"github.com/karlozz157/storicard/src/utils"
 )
 
+const local = "127.0.0.1"
+
 type StoriServer struct {
+	http.Server
 }
 
 func StartServer() {
-	s := StoriServer{}
-	s.Serve()
+	server := &StoriServer{}
+	server.Addr = fmt.Sprintf("%s:%s", local, os.Getenv("PORT"))
+	server.dispatchHanlders()
+
+	log.Fatal(server.ListenAndServe())
 }
 
-func (s *StoriServer) Serve() {
+func (s *StoriServer) dispatchHanlders() {
+
 	db := utils.InitMongoDb()
 	handler := application.NewTransactionHandler(db)
 
-	http.HandleFunc("/storicard", func(w http.ResponseWriter, r *http.Request) {
-		res, err := handler.CreateSummary(context.Background(), s.getBody(r))
+	router := mux.NewRouter()
+	router.HandleFunc("/storicard/{email}", func(w http.ResponseWriter, r *http.Request) {
+		vars := mux.Vars(r)
+		email := vars["email"]
 
-		w.Header().Set("Content-Type", "application/json")
+		res, err := handler.CreateSummary(context.Background(), email, s.getReaderFromRequest(r))
 
 		if err != nil {
-			message, statusCode := s.parseError(err)
-			http.Error(w, message, statusCode)
+			statusCode, _ := e.ParseError(err)
+			w.WriteHeader(statusCode)
+			json.NewEncoder(w).Encode(err)
 			return
 		}
 
 		w.WriteHeader(res.StatusCode)
-		w.Write([]byte(res.Message))
+		json.NewEncoder(w).Encode(res)
 	})
 
-	if err := http.ListenAndServe(":8080", nil); err != nil {
-		log.Fatal(err)
-	}
+	s.Handler = router
 }
 
-func (s *StoriServer) getBody(r *http.Request) io.Reader {
+func (s *StoriServer) getReaderFromRequest(r *http.Request) io.Reader {
 	body, _ := io.ReadAll(r.Body)
 	content, _ := base64.StdEncoding.DecodeString(string(body))
 
 	return strings.NewReader(string(content))
-}
-
-func (s *StoriServer) parseError(err error) (string, int) {
-	message := "houston, we have a problem"
-	statusCode := http.StatusInternalServerError
-
-	if errStori, ok := err.(*e.ErrStori); ok {
-		message = errStori.Mesage
-		statusCode = errStori.StatusCode
-	}
-
-	return message, statusCode
 }

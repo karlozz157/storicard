@@ -18,11 +18,13 @@ const (
 )
 
 type CsvTransactionReader struct {
+	email  string
 	logger *zap.SugaredLogger
 }
 
-func NewCsvTransactionReader() *CsvTransactionReader {
+func NewCsvTransactionReader(email string) *CsvTransactionReader {
 	return &CsvTransactionReader{
+		email:  email,
 		logger: utils.GetLogger(),
 	}
 }
@@ -45,11 +47,13 @@ func (r *CsvTransactionReader) GetTransactions(data io.Reader) ([]*entity.Transa
 		}
 
 		transaction, err := r.transform(row)
+
 		if err != nil {
 			r.logger.Errorw("transform row in transaction", "err", err)
 			continue
 		}
 
+		transaction.Email = r.email
 		transactions = append(transactions, transaction)
 	}
 

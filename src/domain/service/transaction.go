@@ -50,7 +50,7 @@ func (s *TransactionService) CreateTransactions(ctx context.Context, transaction
 	return nil
 }
 
-func (s *TransactionService) GetSummary(ctx context.Context) (*entity.Summary, error) {
+func (s *TransactionService) GetSummary(ctx context.Context, email string) (*entity.Summary, error) {
 
 	summary := entity.Summary{}
 
@@ -59,7 +59,7 @@ func (s *TransactionService) GetSummary(ctx context.Context) (*entity.Summary, e
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		b, err := s.repository.GetBalance(ctx)
+		b, err := s.repository.GetBalance(ctx, email)
 		if err == nil {
 			summary.Balance = b
 		}
@@ -68,7 +68,7 @@ func (s *TransactionService) GetSummary(ctx context.Context) (*entity.Summary, e
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		a, err := s.repository.GetAverageCreditAmount(ctx)
+		a, err := s.repository.GetAverageCreditAmount(ctx, email)
 		if err == nil {
 			summary.AverageCredit = a
 		}
@@ -77,7 +77,7 @@ func (s *TransactionService) GetSummary(ctx context.Context) (*entity.Summary, e
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		a, err := s.repository.GetAverageDebitAmount(ctx)
+		a, err := s.repository.GetAverageDebitAmount(ctx, email)
 		if err == nil {
 			summary.AverageDebit = a
 		}
@@ -86,7 +86,7 @@ func (s *TransactionService) GetSummary(ctx context.Context) (*entity.Summary, e
 	wg.Add(1)
 	go func() {
 		defer wg.Done()
-		t, err := s.repository.GetNumberOfTransactions(ctx)
+		t, err := s.repository.GetNumberOfTransactions(ctx, email)
 		if err == nil {
 			summary.NumberOfTransactions = t
 		}

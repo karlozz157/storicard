@@ -81,7 +81,7 @@ func TestNewCsvTransactionReader(t *testing.T) {
 		},
 	}
 
-	csvTransactionReader := NewCsvTransactionReader()
+	csvTransactionReader := NewCsvTransactionReader("karlozz157@gmail.com")
 
 	for _, test := range tests {
 

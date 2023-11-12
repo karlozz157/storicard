@@ -29,30 +29,31 @@ func NewTransactionRepository(db *mongo.Database) repository.ITransactionReposit
 	}
 }
 
-func (r *TransactionRepository) CreateTransaction(ctx context.Context, account *entity.Transaction) error {
-	result, err := r.db.Collection(transactionCollection).InsertOne(ctx, account)
+func (r *TransactionRepository) CreateTransaction(ctx context.Context, transaction *entity.Transaction) error {
+	result, err := r.db.Collection(transactionCollection).InsertOne(ctx, transaction)
 
 	if err != nil {
-		r.logger.Errorw("creating account", "error", err)
+		r.logger.Errorw("creating transaction", "error", err)
 		return e.ErrInternal
 	}
 
-	r.logger.Infow("created", "result", result)
+	r.logger.Infow("created", "transaction", transaction, "result", result)
 
 	return nil
 }
 
-func (r *TransactionRepository) GetAverageCreditAmount(ctx context.Context) (float64, error) {
-	return r.getAverage(ctx, "$gt")
+func (r *TransactionRepository) GetAverageCreditAmount(ctx context.Context, email string) (float64, error) {
+	return r.getAverage(ctx, email, "$gt")
 }
 
-func (r *TransactionRepository) GetAverageDebitAmount(ctx context.Context) (float64, error) {
-	return r.getAverage(ctx, "$lt")
+func (r *TransactionRepository) GetAverageDebitAmount(ctx context.Context, email string) (float64, error) {
+	return r.getAverage(ctx, email, "$lt")
 }
 
-func (r *TransactionRepository) GetBalance(ctx context.Context) (float64, error) {
+func (r *TransactionRepository) GetBalance(ctx context.Context, email string) (float64, error) {
 
 	pipeline := bson.A{
+		bson.D{{"$match", bson.D{{"email", email}}}},
 		bson.D{
 			{"$group",
 				bson.D{
@@ -66,8 +67,10 @@ func (r *TransactionRepository) GetBalance(ctx context.Context) (float64, error)
 	return r.getTotal(ctx, pipeline)
 }
 
-func (r *TransactionRepository) GetNumberOfTransactions(ctx context.Context) (map[time.Month]int, error) {
-	cursor, err := r.db.Collection(transactionCollection).Find(ctx, bson.M{})
+func (r *TransactionRepository) GetNumberOfTransactions(ctx context.Context, email string) (map[time.Month]int, error) {
+	cursor, err := r.db.Collection(transactionCollection).Find(ctx, bson.M{
+		"email": email,
+	})
 
 	if err != nil {
 		r.logger.Errorw("getting transctions", "error", err)
@@ -95,8 +98,9 @@ func (r *TransactionRepository) GetNumberOfTransactions(ctx context.Context) (ma
 	return numberOfTransactions, nil
 }
 
-func (r *TransactionRepository) getAverage(ctx context.Context, operator string) (float64, error) {
+func (r *TransactionRepository) getAverage(ctx context.Context, email string, operator string) (float64, error) {
 	pipeline := bson.A{
+		bson.D{{"$match", bson.D{{"email", email}}}},
 		bson.D{{"$match", bson.D{{"amount", bson.D{{operator, 0}}}}}},
 		bson.D{
 			{"$group",
