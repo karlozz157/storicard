@@ -1,0 +1,24 @@
+version: '3'
+services:
+  mongo:
+    image: mongo
+    ports:
+      - "27018:27017"
+
+  app:
+    build:
+      context: .
+    ports:
+      - "8080:8080"
+    depends_on:
+      - mongo
+    environment:
+      EMAIL_PORT: "587"
+      EMAIL_HOST: "sandbox.smtp.mailtrap.io"
+      EMAIL_USERNAME: "98bed2986d7e75"
+      EMAIL_PASSWORD: "85b8ea42eee043"
+      MONGO_URI: "mongodb://mongo:27017"
+      MONGO_DATABASE: "storicard"
+      PORT: "8080"
+      ENVIRONMENT: "local"
+  
