@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/base64"
+	"strings"
 
 	"github.com/aws/aws-lambda-go/events"
 	"github.com/aws/aws-lambda-go/lambda"
@@ -18,10 +19,16 @@ var logger = utils.GetLogger()
 func handler(ctx context.Context, request events.LambdaFunctionURLRequest) (events.LambdaFunctionURLResponse, error) {
 	logger.Info("request", request)
 
+	var email string
+	queryStringSplited := strings.Split(request.RawQueryString, "/")
+	if len(queryStringSplited) == 2 {
+		email = queryStringSplited[1]
+	}
+
 	body, _ := base64.StdEncoding.DecodeString(request.Body)
 
 	handler := application.NewTransactionHandler(utils.InitMongoDb())
-	res, err := handler.CreateSummary(context.Background(), "karlozz157@gmail.com", bytes.NewReader(body))
+	res, err := handler.CreateSummary(context.Background(), email, bytes.NewReader(body))
 
 	if err != nil {
 		statusCode, message := e.ParseError(err)
