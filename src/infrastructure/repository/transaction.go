@@ -62,6 +62,14 @@ func (r *TransactionRepository) GetBalance(ctx context.Context, email string) (f
 				},
 			},
 		},
+		bson.D{
+			{"$project",
+				bson.D{
+					{"_id", 0},
+					{"total", bson.D{{"$round", bson.A{"$total", 2}}}},
+				},
+			},
+		},
 	}
 
 	return r.getTotal(ctx, pipeline)
@@ -107,6 +115,14 @@ func (r *TransactionRepository) getAverage(ctx context.Context, email string, op
 				bson.D{
 					{"_id", primitive.Null{}},
 					{"total", bson.D{{"$avg", "$amount"}}},
+				},
+			},
+		},
+		bson.D{
+			{"$project",
+				bson.D{
+					{"_id", 0},
+					{"total", bson.D{{"$round", bson.A{"$total", 2}}}},
 				},
 			},
 		},

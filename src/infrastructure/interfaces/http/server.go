@@ -37,7 +37,7 @@ func (s *StoriServer) dispatchHanlders() {
 	handler := application.NewTransactionHandler(db)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/storicard/{email}", func(w http.ResponseWriter, r *http.Request) {
+	router.HandleFunc("/{email}", func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		email := vars["email"]
 

@@ -54,7 +54,7 @@ func (s *TransactionService) CreateTransactions(ctx context.Context, transaction
 
 func (s *TransactionService) GetSummary(ctx context.Context, email string) (*entity.Summary, error) {
 
-	summary := entity.Summary{}
+	summary := entity.Summary{Email: email}
 
 	wg := sync.WaitGroup{}
 

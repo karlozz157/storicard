@@ -7,4 +7,6 @@ type Summary struct {
 	AverageDebit         float64            `json:"average_debit"`
 	AverageCredit        float64            `json:"average_credit"`
 	NumberOfTransactions map[time.Month]int `json:"number_of_transaction"`
+
+	Email string
 }

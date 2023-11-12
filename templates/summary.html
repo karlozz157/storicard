@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@4.3.1/dist/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+</head>
+<body>
+    <div class="container pt-5">
+        <img src="https://www.storicard.com/_next/static/media/complete-logo.0f6b7ce5.svg" class="d-block m-auto"/>
+
+        <table class="table mt-5">
+            <tr>
+                <td>
+                    Total balance is {{.Balance}}
+                </td>
+                <td>
+                    Average Debit amount: {{.AverageDebit}}
+                </td>
+                <td>
+                    Average Credit amount: {{.AverageCredit}}
+                </td>
+            </tr>
+            {{range $key, $value := .NumberOfTransactions }}
+            <tr>
+                <td>Number of transactions in {{$key}}:</td>
+                <td>{{$value}}</td>
+            </tr>
+            {{end}}
+        </table>
+    </div>
+</body>
+</html>
