@@ -4,13 +4,10 @@ import (
 	"context"
 	"sync"
 
-	"go.mongodb.org/mongo-driver/mongo"
 	"go.uber.org/zap"
 
 	"github.com/karlozz157/storicard/src/domain/entity"
 	"github.com/karlozz157/storicard/src/domain/ports/repository"
-	"github.com/karlozz157/storicard/src/domain/ports/service"
-	repo "github.com/karlozz157/storicard/src/infrastructure/repository"
 )
 
 type TransactionService struct {
@@ -18,10 +15,9 @@ type TransactionService struct {
 	repository repository.ITransactionRepository
 }
 
-func InitTransactionService(db *mongo.Database, logger *zap.SugaredLogger) service.ITransactionService {
+func NewTransactionService(repository repository.ITransactionRepository) *TransactionService {
 	return &TransactionService{
-		repository: repo.InitTransactionRepository(db, logger),
-		logger:     logger,
+		repository: repository,
 	}
 }
 

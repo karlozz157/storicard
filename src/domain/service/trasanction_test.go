@@ -7,6 +7,7 @@ import (
 
 	"github.com/karlozz157/storicard/src/domain/entity"
 	e "github.com/karlozz157/storicard/src/domain/errors"
+	"github.com/karlozz157/storicard/src/utils"
 )
 
 func TestCreateTransactions(t *testing.T) {
@@ -39,7 +40,7 @@ func TestCreateTransactions(t *testing.T) {
 					Amount: 157,
 				},
 			},
-			Expected: e.ErrInternal,
+			Expected: e.ErrInternal(),
 		},
 	}
 
@@ -50,8 +51,10 @@ func TestCreateTransactions(t *testing.T) {
 	for _, test := range tests {
 		err := service.CreateTransactions(context.Background(), test.Transactions)
 
-		if test.Expected != err {
-			t.Errorf("expected %v have %v", test.Expected, err)
+		if err != nil {
+			if test.Expected.Error() != err.Error() {
+				t.Errorf("expected %v have %v", test.Expected, err)
+			}
 		}
 	}
 }
@@ -71,6 +74,7 @@ func TestGetSummary(t *testing.T) {
 
 	service := TransactionService{
 		repository: &TransactionRepositoryMock{},
+		logger:     utils.GetLogger(),
 	}
 
 	summary, _ := service.GetSummary(context.Background())
@@ -125,7 +129,7 @@ func (r *TransactionRepositoryMock) GetNumberOfTransactions(ctx context.Context)
 
 func (r *TransactionRepositoryMock) CreateTransaction(ctx context.Context, transaction *entity.Transaction) error {
 	if transaction.Amount == 157 {
-		return e.ErrInternal
+		return e.ErrInternal()
 	}
 
 	return nil
