@@ -5,7 +5,7 @@ import (
 	"net/http"
 )
 
-var ErrEmailInvalid = NewErrStori("internal", http.StatusInternalServerError)
+var ErrEmailInvalid = NewErrStori("email invalid", http.StatusInternalServerError)
 var ErrEmailRequired = NewErrStori("email is required", http.StatusBadRequest)
 var ErrInternal = NewErrStori("internal", http.StatusInternalServerError)
 
