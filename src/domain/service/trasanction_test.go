@@ -46,6 +46,7 @@ func TestCreateTransactions(t *testing.T) {
 
 	service := TransactionService{
 		repository: &TransactionRepositoryMock{},
+		logger:     utils.GetLogger(),
 	}
 
 	for _, test := range tests {
