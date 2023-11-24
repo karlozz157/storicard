@@ -1,4 +1,4 @@
-# storicard
+# chinguen a su madre #storicard #stori
 
 ## Lambda URL
 https://suwg6jalx4m432iq37rbmu4g540hlfzg.lambda-url.us-east-2.on.aws
